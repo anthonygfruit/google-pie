@@ -1,3 +1,7 @@
 requests
 pandas
 pytrends
+boto3 
+botocore 
+pyarrow 
+fastparquet
