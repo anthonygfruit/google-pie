@@ -8,7 +8,7 @@ from datetime import datetime
 import botocore
 
 REPO_PATH = "/home/ec2-user/google-pie"
-BUCKET = "your-bucket-name"
+BUCKET = "google-search-trends"
 PREFIX = "google_search/"
 set_timeframe = f'2015-01-01 {datetime.today().strftime("%Y-%m-%d")}'
 
