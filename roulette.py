@@ -70,3 +70,8 @@ def get_interest_over_time(keyword):
 
     data = trends_request(url, params)
     return data["default"]["timelineData"]
+
+
+iot = get_interest_over_time("soccer")
+for point in iot[:5]:
+    print(point["time"], point["value"])
