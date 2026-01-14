@@ -1,24 +1,98 @@
-from pytrends.request import TrendReq
+import json
+import os
+import boto3
 import pandas as pd
+from io import BytesIO
+from pytrends.request import TrendReq
+from datetime import datetime
+import botocore
 
-# Minimal setup
-topic_id = 'soccer'
-country_code = 'US'
-category_id = None
-set_timeframe = '2017-01-01 2025-12-31'
+REPO_PATH = "/home/ec2-user/google-pie"
+BUCKET = "your-bucket-name"
+PREFIX = "google_search/"
+set_timeframe = f'2015-01-01 {datetime.today().strftime("%Y-%m-%d")}'
 
-# Minimal pytrends session (no proxy)
-pytrend = TrendReq(hl='en-US', tz=360)
+def load_json_dict(filename):
+    with open(os.path.join(REPO_PATH, filename), "r") as f:
+        return json.load(f)
 
-# Build payload and fetch data
-pytrend.build_payload(kw_list=[topic_id], cat=category_id, geo=country_code, timeframe=set_timeframe)
-df = pytrend.interest_over_time().reset_index()
+def s3_file_exists(bucket, key):
+    s3 = boto3.client("s3")
+    try:
+        s3.head_object(Bucket=bucket, Key=key)
+        return True
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            return False
+        else:
+            raise
 
-# Melt and add minimal columns
-df = df.melt(id_vars=['date'], value_vars=[topic_id], var_name='google_id', value_name='index')
-df['country'] = country_code
-df['topic_id'] = topic_id
-df['category_id'] = category_id
+def google_append_loop():
 
-# print df
-print(df.head())
+    cats = load_json_dict("cat_cds.json")
+    geo_cds = load_json_dict("geo_cds.json")
+    topic_code_dict = load_json_dict("topic_cds.json")
+
+    s3 = boto3.client("s3")
+
+    for topic_name, topic_id in topic_code_dict.items():
+        for ctry_name, ctry_cd in geo_cds.items():
+            for cat_name, cat_id in cats.items():
+
+                # -------------------------
+                # Deduplication check
+                # -------------------------
+                filename = f"{topic_id}_{ctry_cd}_{cat_id}.parquet"
+                s3_key = f"{PREFIX}{filename}"
+
+                if s3_file_exists(BUCKET, s3_key):
+                    print(f"Skipping existing: {filename}")
+                    continue
+
+                try:
+                    # -------------------------
+                    # Pytrends API pull
+                    # -------------------------
+                    pytrend = TrendReq(hl='en-US', tz=360)
+                    pytrend.build_payload(
+                        kw_list=[topic_id],
+                        cat=cat_id,
+                        geo=ctry_cd,
+                        timeframe=set_timeframe
+                    )
+
+                    df = pytrend.interest_over_time().reset_index()
+
+                    df = df.melt(
+                        id_vars=['date'],
+                        value_vars=[topic_id],
+                        var_name='google_id',
+                        value_name='index'
+                    )
+
+                    df['country'] = ctry_name
+                    df['country_iso'] = ctry_cd
+                    df['topic'] = topic_name
+                    df['topic_id'] = topic_id
+                    df['category'] = cat_name
+                    df['category_id'] = cat_id
+
+                    # -------------------------
+                    # Write Parquet to S3
+                    # -------------------------
+                    buffer = BytesIO()
+                    df.to_parquet(buffer, index=False)
+                    buffer.seek(0)
+
+                    s3.put_object(
+                        Bucket=BUCKET,
+                        Key=s3_key,
+                        Body=buffer.getvalue()
+                    )
+
+                    print(f"Uploaded {filename}")
+
+                except Exception as e:
+                    print(f"Error pulling {topic_id} {cat_name} {ctry_cd} >> {e}")
+
+    return True
