@@ -96,3 +96,5 @@ def google_append_loop():
                     print(f"Error pulling {topic_id} {cat_name} {ctry_cd} >> {e}")
 
     return True
+
+google_append_loop()
