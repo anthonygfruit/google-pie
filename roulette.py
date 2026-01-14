@@ -1,3 +1,31 @@
+import requests
+import json
+import pandas as pd
+import random
+import time
+
+WS_API_KEY = 'otq41fzv5815qr277zud81mrb6d9s5f9utujg27g' 
+
+def get_proxies():
+    url = "https://proxy.webshare.io/api/v2/proxy/list/?mode=direct"
+    headers = {"Authorization": f"Token {WS_API_KEY}"}
+    r = requests.get(url, headers=headers)
+    data = r.json()
+    proxies = []
+    for p in data["results"]:
+        ip = p["proxy_address"]
+        port = p["port"]
+        username = p["username"]
+        password = p["password"] 
+        proxies.append(f"http://{username}:{password}@{ip}:{port}")
+        
+        return proxies
+    
+proxy_list = get_proxies()
+    
+def random_proxy():
+    return random.choice(proxy_list)
+
 BASE = "https://trends.google.com/trends/api"
 
 def trends_request(url, params=None, max_retries=5):
