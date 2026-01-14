@@ -41,7 +41,6 @@ def trends_request(url, params=None, max_retries=5):
                 url,
                 params=params,
                 headers=headers,
-                proxies={"http": proxy, "https": proxy},
                 timeout=10
             )
 
@@ -69,7 +68,7 @@ def get_explore_token(keyword, geo="", timeframe="now 7-d"):
     url = f"{BASE}/explore"
     params = {
         "hl": "en-US",
-        "tz": "-480",
+        "tz": "360",
         "req": json.dumps({
             "comparisonItem": [{"keyword": keyword, "geo": geo, "time": timeframe}],
             "category": 0,
