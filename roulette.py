@@ -39,6 +39,8 @@ def google_append_loop():
         for ctry_name, ctry_cd in geo_cds.items():
             for cat_name, cat_id in cats.items():
 
+                print(f"Pulling: topic='{topic_name}' ({topic_id}), country='{ctry_name}' ({ctry_cd}), category='{cat_name}' ({cat_id})")
+
                 # -------------------------
                 # Deduplication check
                 # -------------------------
