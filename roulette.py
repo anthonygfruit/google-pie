@@ -6,6 +6,7 @@ from io import BytesIO
 from pytrends.request import TrendReq
 from datetime import datetime
 import botocore
+import requests
 
 REPO_PATH = "/home/ec2-user/google-pie"
 BUCKET = "google-search-trends"
