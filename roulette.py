@@ -80,22 +80,18 @@ def google_append_loop(proxy_list=None):
                         pytrend = TrendReq(hl='en-US', tz=360, proxies=proxy_list)
                     else:
                         pytrend = TrendReq(hl='en-US', tz=360)
-                        
-                    pytrend.build_payload(
-                        kw_list=[topic_id],
-                        cat=cat_id,
-                        geo=ctry_cd,
-                        timeframe=set_timeframe
-                    )
 
+                    #add topic name as keyword too
+                    topic_name_lower = topic_name.lower() if isinstance(topic_name, str) else topic_name
+
+                    #pull both the topic and the keyword
+                    pytrend.build_payload(kw_list=[topic_id, topic_name_lower], cat=cat_id, geo=ctry_cd, timeframe=set_timeframe)
+
+                    #get interest over time metric
                     df = pytrend.interest_over_time().reset_index()
 
-                    df = df.melt(
-                        id_vars=['date'],
-                        value_vars=[topic_id],
-                        var_name='google_id',
-                        value_name='index'
-                    )
+                    #melt to format
+                    df = df.melt(id_vars=['date'], value_vars=[topic_id], var_name='google_id', value_name='index')
 
                     df['country'] = ctry_name
                     df['country_iso'] = ctry_cd
@@ -103,6 +99,7 @@ def google_append_loop(proxy_list=None):
                     df['topic_id'] = topic_id
                     df['category'] = cat_name
                     df['category_id'] = cat_id
+                    df['trend_type'] = df['google_id'].apply(lambda x: 'sport' if x == topic_id else 'sport keyword')
 
                     # -------------------------
                     # Write Parquet to S3
