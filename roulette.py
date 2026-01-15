@@ -44,7 +44,7 @@ def google_append_loop():
                 # -------------------------
                 # Deduplication check
                 # -------------------------
-                filename = f"{topic_id}_{ctry_cd}_{cat_id}.parquet"
+                filename = f"{topic_name}_{ctry_name}_{cat_name}.parquet"
                 s3_key = f"{PREFIX}{filename}"
 
                 if s3_file_exists(BUCKET, s3_key):
