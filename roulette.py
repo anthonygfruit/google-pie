@@ -27,6 +27,21 @@ def s3_file_exists(bucket, key):
         else:
             raise
 
+def get_proxies():
+    url = "https://proxy.webshare.io/api/v2/proxy/list/?mode=direct"
+    headers = {"Authorization": "Token otq41fzv5815qr277zud81mrb6d9s5f9utujg27g"}
+    r = requests.get(url, headers=headers)
+    data = r.json()
+    proxies = []
+    for p in data["results"]:
+        ip = p["proxy_address"]
+        port = p["port"]
+        username = p["username"]
+        password = p["password"] 
+        proxies.append(f"http://{username}:{password}@{ip}:{port}")
+        
+        return proxies
+
 def google_append_loop():
 
     cats = load_json_dict("cat_cds.json")
@@ -55,7 +70,7 @@ def google_append_loop():
                     # -------------------------
                     # Pytrends API pull
                     # -------------------------
-                    pytrend = TrendReq(hl='en-US', tz=360)
+                    pytrend = TrendReq( hl='en-US', tz=360, proxies=get_proxies())
                     pytrend.build_payload(
                         kw_list=[topic_id],
                         cat=cat_id,
