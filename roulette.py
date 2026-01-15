@@ -7,6 +7,7 @@ from pytrends.request import TrendReq
 from datetime import datetime
 import botocore
 import requests
+import random
 
 REPO_PATH = "/home/ec2-user/google-pie"
 BUCKET = "google-search-trends"
@@ -54,6 +55,7 @@ def google_append_loop(proxy_list=None):
     for topic_name, topic_id in topic_code_dict.items():
         for ctry_name, ctry_cd in geo_cds.items():
             for cat_name, cat_id in cats.items():
+                time.sleep( random.randint(3, 5))
 
                 print(f"Pulling: topic='{topic_name}' ({topic_id}), country='{ctry_name}' ({ctry_cd}), category='{cat_name}' ({cat_id})")
 
