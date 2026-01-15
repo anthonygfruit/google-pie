@@ -1,0 +1,4 @@
+Pulls search index (from 0 to 100) of search topics such as /m/06qjgc (Leo Messi Goat) from Google Trends via pytrends API.
+Current topic focus is on sport but possible to extend this to include athletes, leagues, influencers, and more!
+Runs on EC2 instance and saves parquets for each topic/country/category combination.
+Categories include general (all searches), shopping, athletic apparel, footwear, and entertainment media.
