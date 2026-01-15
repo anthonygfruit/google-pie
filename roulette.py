@@ -42,7 +42,7 @@ def get_proxies():
         
         return proxies
 
-def google_append_loop():
+def google_append_loop(proxy_list=None):
 
     cats = load_json_dict("cat_cds.json")
     geo_cds = load_json_dict("geo_cds.json")
@@ -70,7 +70,11 @@ def google_append_loop():
                     # -------------------------
                     # Pytrends API pull
                     # -------------------------
-                    pytrend = TrendReq( hl='en-US', tz=360, proxies=get_proxies())
+                    if proxies:
+                        pytrend = TrendReq(hl='en-US', tz=360, proxies=proxy_list)
+                    else:
+                        pytrend = TrendReq(hl='en-US', tz=360)
+                        
                     pytrend.build_payload(
                         kw_list=[topic_id],
                         cat=cat_id,
