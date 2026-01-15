@@ -72,7 +72,7 @@ def google_append_loop(proxy_list=None):
                     # Pytrends API pull
                     # -------------------------
                     if proxy_list is not None:
-                        pytrend = TrendReq(hl='en-US', tz=360)#, proxies=proxy_list)
+                        pytrend = TrendReq(hl='en-US', tz=360, proxies=proxy_list)
                     else:
                         pytrend = TrendReq(hl='en-US', tz=360)
                         
@@ -120,4 +120,4 @@ def google_append_loop(proxy_list=None):
     return True
 
 prox = get_proxies()
-google_append_loop(prox)
+google_append_loop()
