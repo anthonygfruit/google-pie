@@ -8,6 +8,7 @@ from datetime import datetime
 import botocore
 import requests
 import random
+import time
 
 REPO_PATH = "/home/ec2-user/google-pie"
 BUCKET = "google-search-trends"
